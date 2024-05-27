@@ -1,0 +1,43 @@
+Option Explicit
+
+Sub minvariance()
+    Dim kRow As Long
+    Dim kLast As Long
+    Dim X As Double
+        
+        kLast = Sheets("hedpas").Range("U3").End(xlDown).Row
+        
+        For kRow = 2 To kLast
+        
+        SolverReset
+            SolverOptions AssumeNonNeg:=False
+            SolverOk SetCell:="$B$22", _
+            MaxMinVal:=2, ValueOf:=0, _
+            ByChange:="$B$14:$B$17", _
+            Engine:=1, EngineDesc:="GRG Nonlinear"
+            
+            'contraintes
+            SolverAdd CellRef:="$B$18", Relation:=2, FormulaText:="1"
+            SolverAdd CellRef:="$B$20", Relation:=2, FormulaText:=Sheets("hedpas").Range("$U$1").Offset(kRow, 0).Address
+            
+   
+            SolverSolve (True)
+    
+            'aprouver la solution et eviter les fenetres emergents
+            SolverSolve userFinish:=True
+            SolverFinish KeepFinal:=1
+        
+             'copiez la valeur de $B$22 et place le dans la colonne S
+            Sheets("hedpas").Range("$S$1").Offset(kRow, 0).Value = Sheets("hedpas").Range("$B$22").Value
+            Sheets("hedpas").Range("$T$1").Offset(kRow, 0).Value = Sqr(Sheets("hedpas").Range("$B$22").Value)
+            
+            
+            Sheets("hedpas").Range("$V$1").Offset(kRow, 0).Value = Sheets("hedpas").Range("$B$14").Value
+            Sheets("hedpas").Range("$W$1").Offset(kRow, 0).Value = Sheets("hedpas").Range("$B$15").Value
+            Sheets("hedpas").Range("$X$1").Offset(kRow, 0).Value = Sheets("hedpas").Range("$B$16").Value
+            Sheets("hedpas").Range("$Y$1").Offset(kRow, 0).Value = Sheets("hedpas").Range("$B$17").Value
+
+        Next kRow
+
+End Sub
+
